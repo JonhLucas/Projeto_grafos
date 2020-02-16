@@ -3,6 +3,6 @@
   
 ## Instruções:
   - <b>Floyd-Warshall</b>:</br>
-  No arquivo denominado <b>entrada</b> deve ser colocado o grafo. A saída será dada no terminal
+  No arquivo denominado <b>entrada</b> (deve estar no mesmo diretório) deve ser colocado o grafo. A saída será dada no terminal
   - <b>Bellman-Ford</b>:</br>
-  No arquivo denominado <b>entrada</b> deve ser colocado o grafo. A saída será dada no terminal. O vértice inicial S está setado para o vértice 0, pode ser alterado na chamada da função.
+  No arquivo denominado <b>entrada</b> (deve estar no mesmo diretório) deve ser colocado o grafo. A saída será dada no terminal. O vértice inicial S está setado para o vértice 0, pode ser alterado na chamada da função.
