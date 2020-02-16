@@ -84,19 +84,9 @@ int dequeue(queue* q)
 	}
 }
 
-adj* create_edge(int vertex, int weight)
-{
-  adj* new = (adj*)malloc(sizeof(adj));
-  new->next = NULL;
-  new->item = vertex;
-  new->weight = weight;
-  return new;
-}
-
 typedef struct graph
 {
 	adj **vertices;
-  adj **path;
 	int *visited;
 	int *adj_size;
   int *parent;
@@ -107,7 +97,6 @@ graph* create_graph(int size)
 {
 	graph* new = (graph*) malloc(sizeof(graph));
 	new->vertices = (adj**) malloc(sizeof(adj*)*size);
-  new->path = (adj**) malloc(sizeof(adj*)*size);
 	new->visited = (int*) malloc(sizeof(int)*size);
   new->parent = (int*)malloc(sizeof(int)*size);
   new->weight = (int*)malloc(sizeof(int)*size);
@@ -115,24 +104,33 @@ graph* create_graph(int size)
 	int i;
 	for (i = 0; i < size; ++i)
 	{
-    new->path[i] = create_edge(i, 0);
 		new->vertices[i] = NULL;
 		new->visited[i] = 0;
 		new->adj_size[i] = 0;
-    new->parent[i] = -1;
-    new->weight[i] = INT_MAX;
+        new->parent[i] = -1;
+        new->weight[i] = INT_MAX;
 	}
 	return new;
 }
-void add_edge(graph* grafo, int vertex1, int vertex2, int weight)
+
+adj* create_edge(int vertex, int weight)
 {
-  adj* vertice1 = create_edge(vertex2, weight);
-  vertice1->next = grafo->vertices[vertex1];
-  grafo->vertices[vertex1] = vertice1;
-  grafo->adj_size[vertex1] += 1;
+	adj* new = (adj*)malloc(sizeof(adj));
+	new->next = NULL;
+	new->item = vertex;
+	new->weight = weight;
+	return new;
 }
 
-void dijkstra(int begin, graph* grafo)
+void add_edge(graph* grafo, int vertex1, int vertex2, int weight)
+{
+	adj* vertice1 = create_edge(vertex2, weight);
+  vertice1->next = grafo->vertices[vertex1];
+  grafo->vertices[vertex1] = vertice1;
+	grafo->adj_size[vertex1] += 1;
+}
+
+void prim(int begin, graph* grafo, int size)
 {
   queue* new_queue = create_queue();
   adj* aux, *lista_adjascencia;
@@ -143,51 +141,46 @@ void dijkstra(int begin, graph* grafo)
   {
     v = dequeue(new_queue);
     lista_adjascencia = grafo->vertices[v];
-    while (lista_adjascencia != NULL)
+    while (lista_adjascencia != NULL && grafo->visited[v] != 1)
     {
       u = lista_adjascencia->item;
       weight = lista_adjascencia->weight;
-      if (grafo->weight[u] > grafo->weight[v] + weight)
+      if (grafo->weight[u] > weight && grafo->visited[u] != 1)
       {
-          grafo->weight[u] = grafo->weight[v] + weight;
+          grafo->weight[u] = weight;
           enqueue(new_queue, u, grafo->weight[u]);
           grafo->parent[u] = v;
-          grafo->path[u]->next = grafo->path[v];
       }
       lista_adjascencia = lista_adjascencia->next;
-    }     
+    }
+    grafo->visited[v] = 1;
   }
 }
 int main(int argc, char const *argv[])
 {
-	int size, edge, source = 0;
+	int size, edge, mst_weight = 0, i, weigth, vertice1, vertice2, root = 0;
   scanf("%d%d", &size, &edge);
-  adj* aux;
   graph* grafo = create_graph(size);
-  int i, j, k, x, y;
+  graph* mst = create_graph(size);
   for(i =0; i < edge; i++)
   {
-    scanf("%d%d%d", &x, &y, &k);
-    add_edge(grafo, x, y, k);
-    add_edge(grafo, y, x, k);
+    scanf("%d%d%d", &vertice1, &vertice2, &weigth);
+    add_edge(grafo, vertice1, vertice2, weigth);
+    add_edge(grafo, vertice2, vertice1, weigth);
   }
-  scanf("%d", &source);
-  printf("Fonte: %d\n", source);
-  dijkstra(source, grafo);
+  scanf("%d", &root);
+  prim(root, grafo, size);
+  printf("Raiz: %d\n", root);
   for (i = 0; i < size; i++)
   {
-    printf("Vertice: %d, custo: %d, caminho ate a fonte: ",i, grafo->weight[i]);
-    aux = grafo->path[i];
-    while(aux != NULL)
+    if (grafo->parent[i] != -1)
     {
-      printf("%d ", aux->item);
-      aux = aux->next;
-      if (aux!=NULL)
-      {
-        printf("-> ");
-      }
+        mst_weight += grafo->weight[i];
+        printf("Aresta: (%d,%d), Peso: %d\n", grafo->parent[i], i, grafo->weight[i]);
+        add_edge(mst, grafo->parent[i], i, grafo->weight[i]);
+        add_edge(mst, i, grafo->parent[i], grafo->weight[i]);
     }
-    printf("\n");
   }
+  printf("Custo total da MST: %d\n", mst_weight);
 	return 0;
 }
