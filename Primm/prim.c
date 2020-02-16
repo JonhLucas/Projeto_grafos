@@ -113,7 +113,7 @@ graph* create_graph(int size)
 	return new;
 }
 
-adj* create_adj(int vertex, int weight)
+adj* create_edge(int vertex, int weight)
 {
 	adj* new = (adj*)malloc(sizeof(adj));
 	new->next = NULL;
@@ -124,7 +124,7 @@ adj* create_adj(int vertex, int weight)
 
 void add_edge(graph* grafo, int vertex1, int vertex2, int weight)
 {
-	adj* vertice1 = create_adj(vertex2, weight);
+	adj* vertice1 = create_edge(vertex2, weight);
   vertice1->next = grafo->vertices[vertex1];
   grafo->vertices[vertex1] = vertice1;
 	grafo->adj_size[vertex1] += 1;
@@ -154,45 +154,33 @@ void prim(int begin, graph* grafo, int size)
       lista_adjascencia = lista_adjascencia->next;
     }
     grafo->visited[v] = 1;
-    
   }
 }
 int main(int argc, char const *argv[])
 {
-	int size, edge;
+	int size, edge, mst_weight = 0, i, weigth, vertice1, vertice2, root = 0;
   scanf("%d%d", &size, &edge);
-  adj* aux;
   graph* grafo = create_graph(size);
-  int i, j, k, x, y, a[size][size];
+  graph* mst = create_graph(size);
   for(i =0; i < edge; i++)
   {
-    scanf("%d%d%d", &x, &y, &k);
-    add_edge(grafo, x-1, y-1, k);
-    add_edge(grafo, y-1, x-1, k);
+    scanf("%d%d%d", &vertice1, &vertice2, &weigth);
+    add_edge(grafo, vertice1-1, vertice2-1, weigth);
+    add_edge(grafo, vertice2-1, vertice1-1, weigth);
   }
-  prim(0, grafo, size);
-  for (i = 0; i < size; i++)
-  {
-    for (j = 0; j < size; j++)
-    {
-      a[i][j] = 0;
-    }
-  }
+  scanf("%d", &root);
+  prim(root, grafo, size);
+  printf("Raiz: %d\n", root);
   for (i = 0; i < size; i++)
   {
     if (grafo->parent[i] != -1)
     {
-        a[i][grafo->parent[i]] = grafo->weight[i];
-        a[grafo->parent[i]][i] = grafo->weight[i];
+        mst_weight += grafo->weight[i];
+        printf("Aresta: (%d,%d), Peso: %d\n", grafo->parent[i]+1, i+1, grafo->weight[i]);
+        add_edge(mst, grafo->parent[i], i, grafo->weight[i]);
+        add_edge(mst, i, grafo->parent[i], grafo->weight[i]);
     }
   }
-  for (i = 0; i < size; i++)
-  {
-    for (j = 0; j < size; j++)
-    {
-      printf("%d ", a[i][j]);
-    }
-    printf("\n");
-  }
+  printf("Peso total da MST: %d\n", mst_weight);
 	return 0;
 }

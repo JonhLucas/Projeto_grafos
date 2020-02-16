@@ -145,7 +145,6 @@ void dijkstra(int begin, graph* grafo)
   while(!is_empty(new_queue))
   {
     v = dequeue(new_queue);
-    printf("%d\n", v+1);
     lista_adjascencia = grafo->vertices[v];
     while (lista_adjascencia != NULL)
     {
@@ -163,7 +162,7 @@ void dijkstra(int begin, graph* grafo)
 }
 int main(int argc, char const *argv[])
 {
-	int size, edge;
+	int size, edge, source = 0;
   scanf("%d%d", &size, &edge);
   adj* aux;
   graph* grafo = create_graph(size);
@@ -174,10 +173,12 @@ int main(int argc, char const *argv[])
     add_edge(grafo, x-1, y-1, k);
     add_edge(grafo, y-1, x-1, k);
   }
-  dijkstra(0, grafo);
+  scanf("%d", &source);
+  printf("Fonte: %d\n", source);
+  dijkstra(source-1, grafo);
   for (i = 0; i < size; i++)
   {
-    printf("%d %d\n", grafo->weight[i], grafo->parent[i]);
+    printf("Vertice: %d, Peso: %d\n",i+1, grafo->weight[i]);
   }
 	return 0;
 }
